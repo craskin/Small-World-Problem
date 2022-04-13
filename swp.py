@@ -73,14 +73,3 @@ bigGraph = loadGraph('edges.txt')
 distanceDistribution(graph)
 BFS(graph, 5)
 BFS(graph, 13)
-
-""" 
-This small-world problem emulation shows that even if two people don't directly know each other,
-a majority are at least within 6 degrees of separation from one another. A majority are actually more within
-2-5 degrees of separation. When running with the larger file, it shows that there are a very
-small proportion that are up to 8 degrees of separation from each other.
-
-When I was first introduced to this phenomenon (at a fairly young age), I was told it was called the Six degrees
-of Kevin Bacon. Meaning that every person in the world is at least within in 6 degrees of separation
-with actor Kevin Bacon. 
-"""
