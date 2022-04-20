@@ -1,17 +1,26 @@
-import networkx as nx
-import collections
 
 def loadGraph(edgeFilename):
-    list1 = []
+    adj = []
+    max =-200000000
     with open(edgeFilename, "r") as f:
         graph = f.read().splitlines()
         for line in graph:
             x = line.split(" ")
             a = int(x[0])
             b = int(x[1])
-            combine = a, b
-            list1.append(combine)
-    return list1
+            if a > max:
+                max = a
+            if b > max:
+                max = b
+        for i in range(0, max+1):
+                adj.append([])
+        for line in graph:
+                x = line.split(" ")
+                a = int(x[0])
+                b = int(x[1])
+                adj[a].append(b)
+                adj[b].append(a)
+    return adj
 
 class MyQueue:
     def __init__(self):
@@ -21,55 +30,57 @@ class MyQueue:
         return f"{self.items}"
 
     def enqueue(self, stuff):
-        return self.items.insert(0, stuff)
+        return self.items.append(stuff)
 
     def dequeue(self):
-        return self.items.pop()
+        return self.items.pop(0)
 
     def empty(self):
         return self.items == []
 
 def BFS(G, s):
     queue = MyQueue()
-    visited = []
-    visited.append(s)
+    distance = []
+    for u in range(0, len(G)):
+        distance.append(float('inf'))
+    distance[s] = 0
     queue.enqueue(s)
     while not queue.empty():
-        m = queue.dequeue()
-        for neighbor in G[m]:
-            if neighbor not in visited:
-                visited.append(neighbor)
-                queue.enqueue(neighbor)
-    print(visited)
-    return visited
+        u = queue.dequeue()
+
+        for v in G[u]:
+            if distance[v] == (float('inf')):
+                distance[v] = distance[u]+1
+                queue.enqueue(v)
+
+    print(G, s, distance)
+    return distance
 
 def distanceDistribution(G):
-    graph = nx.Graph(G)
-    distance = []
-    dict1 = {}
-    dict2 = dict(nx.all_pairs_shortest_path_length(graph))
+
+    dict1 ={}
     percentages = []
-    numbers = []
-    for node1 in dict2:
-        for node2 in dict2[node1]:
-            if dict2[node1][node2] > 0:
-                distance.append(dict2[node1][node2])
-    counter = collections.Counter()
-    for i in distance:
-        counter[i] += 1
-    total = sum(counter.values())
-    for num, count in sorted(counter.items()):
-        numbers.append(num)
-        print(str(round(count/total*100, 2))+"% of all distances are", num, "apart")
-        percent = str(round(count/total*100,2))+"%"
-        percentages.append(percent)
-    for i in range(len(numbers)):
-        dict1[numbers[i]] = percentages[i]
-    print(dict1)
-    return dict1
+    total =0
+    for j in range(0, len(G)):
+        distance = BFS(G, j)
+        for i in range(0, len(distance)):
+            if distance[i] in dict1.keys():
+                tmp = dict1[distance[i]]
+                tmp +=1
+                dict1[distance[i]] = tmp
+                total +=1
+            else:
+                dict1[distance[i]] =1
+                total +=1
+    for key in dict1.keys():
+        percentages.append(str(key) + ":"+ str((round(dict1[key]/total*100, 2)))+'%')
+    print("Total percentages:", percentages)
+
+    return percentages
 
 graph = loadGraph('edgesshort.txt')
-bigGraph = loadGraph('edges.txt')
+# bigGraph = loadGraph('edges.txt')
+
 distanceDistribution(graph)
-BFS(graph, 5)
-BFS(graph, 13)
+# distanceDistribution(bigGraph)
+
